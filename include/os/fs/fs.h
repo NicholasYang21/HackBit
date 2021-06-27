@@ -3,6 +3,8 @@
 #include "directory.h"
 #include "file.h"
 
+#include "../../functions/split.h"
+
 #include <cstring>
 
 namespace hackbit {

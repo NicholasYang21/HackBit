@@ -15,10 +15,12 @@ namespace hackbit {
 class Directory {
 public:
   Directory() = default;
-  Directory(const string& dn, int uid);
+  Directory(const string& dn, int uid, Directory* father);
 
   vector<File*> files;
   vector<Directory*> dirs;
+
+  Directory* father;
 
   string c_time;
   string name;
