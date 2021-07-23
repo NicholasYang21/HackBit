@@ -214,7 +214,7 @@ private:
   Directory* m_working; // working directory.
 
 public:
-  // TODO
+
 };
 
 // NAME:
