@@ -5,4 +5,4 @@ set(CMAKE_CXX_STANDARD 17)
 
 set(CMAKE_CXX_FLAGS "-static ${CMAKE_CXX_FLAGS}")
 
-add_executable(HackBit src/game_main.cc include/filesystem.h)
+add_executable(HackBit Metta/src/game_main.cc Metta/include/filesystem.h)
