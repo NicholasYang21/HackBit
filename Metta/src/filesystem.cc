@@ -53,4 +53,16 @@ void FileOp::Display(File* f) {
   cout << f->content_ << flush;
 }
 
+// class Directory
+Directory::Directory(string name, int id) {
+  this->name_ = name;
+  this->owner_ = id;
+
+  time_t time_; time(&time_);
+  char tmp[80]; struct tm* tmp_tm = localtime(&time_);
+  strftime(tmp, 80, "(%a) %b %d, %Y [%H:%M:%S]", tmp_tm);
+
+  this->date_ = string(tmp);
+}
+
 } // namespace hackbit::filesystem

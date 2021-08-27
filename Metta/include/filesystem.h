@@ -104,11 +104,27 @@ class FileOp {
  */
 class Directory : public File {
  public:
+  Directory() = default;
 
+  /**
+   * @brief This constructor will sets the directory's name and owner's UID.
+   * @param name the name of dir.
+   * @param id the owner's UID of dir.
+   */
+  explicit Directory(string name, int id);
 
  private:
+  friend class DirOp;
+
   vector<File*> subfiles; /**< The sub files of this directory. */
   vector<Directory*> subdirs; /**< The sub directories of this directory. */
+};
+
+class DirOp {
+ public:
+  void AddFile();
+
+  void AddDir();
 };
 
 } // namespace hackbit::filesystem
