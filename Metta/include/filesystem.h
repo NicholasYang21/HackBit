@@ -6,10 +6,12 @@
 
 #include <time.h>
 
+#include <map>
 #include <string>
 #include <vector>
 #include <iostream>
 
+using std::map;
 using std::cout;
 using std::flush;
 using std::string;
@@ -66,11 +68,16 @@ class File {
   string name_; /**< the name of file. */
 
  private:
-  friend class FileOp;
+  friend class FileOp; friend class Interpreter;
 
   string content_; /**< the contents of file. */
 };
 
+/**
+ *
+ * @brief This is a auxiliary unit in the HackBit-filesystem(HFS).
+ *        This class declared necessary actions of a file.
+ */
 class FileOp {
  public:
   /**
@@ -78,7 +85,7 @@ class FileOp {
    * @param [in] f will be operated file.
    * @param [in] new_uid need binds UID.
    */
-  void SetUID(File* f, int new_uid);
+  static void SetUID(File* f, int new_uid);
 
   /**
    * @brief This function will writes some contents to file follows the 'mode'.
@@ -87,13 +94,13 @@ class FileOp {
    * @param [in] mode writing mode, mode == 0, clears all current contents and write.
    *                  mode == 1, appends the contents.
    */
-  void Write(File* f, string contents, int mode = 0);
+  static void Write(File* f, string contents, int mode = 0);
 
   /**
    * @brief This function displays the contents of a file.
    * @param [in] f will be displayed file.
    */
-  void Display(File* f);
+  static void Display(File* f);
 };
 
 /**
@@ -111,20 +118,121 @@ class Directory : public File {
    * @param name the name of dir.
    * @param id the owner's UID of dir.
    */
-  explicit Directory(string name, int id);
+  explicit Directory(string name, int id, Directory* parent);
 
  private:
   friend class DirOp;
+  friend class FileSystem;
+
+  Directory* parent_; /**< The parent of directory. */
 
   vector<File*> subfiles; /**< The sub files of this directory. */
   vector<Directory*> subdirs; /**< The sub directories of this directory. */
 };
 
+/**
+ *
+ * @brief This is a auxiliary unit in the HackBit-filesystem(HFS).
+ *        This class declared necessary actions of a directory.
+ */
 class DirOp {
  public:
-  void AddFile();
+  /**
+   * @brief add a file to a directory.
+   * @param [in] d destination directory.
+   * @param [in] add will be added file.
+   */
+  static void AddFile(Directory* d, File* add);
 
-  void AddDir();
+  /**
+   * @brief add a directory to another directory.
+   * @param [in] d destination directory.
+   * @param [in] add will be added directory.
+   */
+  static void AddDir(Directory* d, Directory* add);
+
+  /**
+   * @brief delete a file from directory.
+   * @param [in] d parent directory.
+   * @param [in] name will be deleted directory's name.
+   */
+  static void DeleteFile(Directory* d, const string& name);
+
+  /**
+   * @brief delete a directory from its parent directory.
+   * @param [in] d parent directory.
+   * @param [in] name will be deleted directory's name.
+   */
+  static void DeleteDir(Directory* d, const string& name);
+
+  /**
+   * @brief find a subdir.
+   * @param [in] d parent directory.
+   * @param [in] name
+   * @return find operation was success or not.
+   */
+  static int FindDir(Directory* d, string name);
+};
+
+class Program : public File {
+ public:
+  /**
+   * @brief This constructor will sets the name, function, and the id of the file.
+   * @param name file's name.
+   * @param func program.
+   * @param id owner's UID.
+   */
+  Program(std::string name, int (*func)(vector<string>), int id);
+
+  /**
+   * @brief Run this program.
+   */
+  void Run(vector<string>);
+
+ private:
+  int (*func_)(vector<string>);
+};
+
+/**
+ *
+ * @brief This is the main(core) unit in the HackBit-filesystem(HFS).
+ *        This class simulated a filesystem.
+ */
+class FileSystem {
+ public:
+  /**
+   * @brief Init this filesystem.
+   */
+  FileSystem();
+
+  /**
+   *
+   * @brief Find the path of a directory/file.
+   * @param [in] path The path to be found.
+   * @return a directory indicates the file/dirs' parent directory.
+   */
+  Directory* FindPath(string path);
+
+ private:
+  Directory root; /**< root directory in a filesystem. */
+  Directory curr; /**< working directory */
+};
+
+/**
+ *
+ * @brief This is the auxiliary unit in the HackBit-Main-Part(HMP).
+ *        This class supplies the tool functions.
+ */
+class Tools {
+ public:
+  /**
+   *
+   * @brief This function can split a string follow some rule (separator).
+   * @param [in] str The string to be split.
+   * @param [in] separator The rule(separator).
+   * @return a vector, all substrings are in it.
+   */
+  static vector<string> Split(string str, string separator = "/");
 };
 
 } // namespace hackbit::filesystem
